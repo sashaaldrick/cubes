@@ -10,6 +10,8 @@
   let animationId: number;
   let isAnimating = false;
   let startAnimation: () => void;
+  let cubeX = -2;
+  let cubeZ = 2;
 
   onMount(() => {
     const scene = new THREE.Scene();
@@ -21,7 +23,7 @@
       0.1,
       1000
     );
-    camera.position.set(0, 5, 0);
+    camera.position.set(0, 10, 0);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ 
@@ -32,12 +34,46 @@
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+    // Create grid
+    const gridSize = 3;
+    const cellSize = 2;
+    const gridHelper = new THREE.Group();
+    
+    // Create grid lines
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x888888 });
+    
+    // Horizontal lines
+    for (let i = 0; i <= gridSize; i++) {
+      const geometry = new THREE.BufferGeometry();
+      const points = [];
+      points.push(new THREE.Vector3(-gridSize, 0, i * cellSize - gridSize));
+      points.push(new THREE.Vector3(gridSize, 0, i * cellSize - gridSize));
+      geometry.setFromPoints(points);
+      const line = new THREE.Line(geometry, lineMaterial);
+      gridHelper.add(line);
+    }
+    
+    // Vertical lines
+    for (let i = 0; i <= gridSize; i++) {
+      const geometry = new THREE.BufferGeometry();
+      const points = [];
+      points.push(new THREE.Vector3(i * cellSize - gridSize, 0, -gridSize));
+      points.push(new THREE.Vector3(i * cellSize - gridSize, 0, gridSize));
+      geometry.setFromPoints(points);
+      const line = new THREE.Line(geometry, lineMaterial);
+      gridHelper.add(line);
+    }
+    
+    scene.add(gridHelper);
+
+    // Create cube
     const geometry = new THREE.BoxGeometry(2, 2, 2);
     const material = new THREE.MeshBasicMaterial({
       color: 0x0066cc,
       wireframe: false
     });
     const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(cubeX, 1, cubeZ);
     scene.add(cube);
 
     const edges = new THREE.EdgesGeometry(geometry);
