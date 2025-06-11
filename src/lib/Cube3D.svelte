@@ -16,6 +16,7 @@
   let cubeX = -2;
   let cubeZ = 2;
   let targetX = -2;
+  let targetZ = 2;
 
   onMount(() => {
     const scene = new THREE.Scene();
@@ -102,7 +103,11 @@
     // Rolling animation variables
     let rollProgress = 0;
     let rollStartX = 0;
-    let rollStartRotation = 0;
+    let rollStartZ = 0;
+    let rollStartRotationX = 0;
+    let rollStartRotationZ = 0;
+    let rollAxis = ''; // 'x' for left/right, 'z' for up/down
+    let rollDirection = 1; // 1 for right/up, -1 for left/down
 
     const animate = () => {
       if (rollProgress < 1) {
@@ -110,19 +115,31 @@
         
         const angle = (Math.PI / 2) * rollProgress;
         
-        // Rolling right: pivot around bottom-right edge
-        // Pivot is at the bottom-right corner of the cube at ground level
-        const pivotX = rollStartX + 1; // Right edge of cube
-        const pivotY = 0; // Ground level
-        
-        // As the cube rolls, it follows a circular arc around the pivot
-        // The center of the cube moves in a quarter circle with radius 1 (half cube size)
-        cube.position.x = pivotX + Math.sin(angle) * 1;
-        cube.position.y = pivotY + Math.cos(angle) * 1;
-        cube.position.z = cubeZ;
-        
-        // The cube rotates clockwise when rolling right
-        cube.rotation.z = rollStartRotation - angle;
+        if (rollAxis === 'x') {
+          // Rolling left/right: pivot around left/right edge
+          const pivotX = rollStartX + rollDirection; // Right edge (+1) or left edge (-1)
+          const pivotY = 0; // Ground level
+          
+          // As the cube rolls, it follows a circular arc around the pivot
+          cube.position.x = pivotX + Math.sin(angle) * rollDirection;
+          cube.position.y = pivotY + Math.cos(angle) * 1;
+          cube.position.z = cubeZ;
+          
+          // The cube rotates around Z axis
+          cube.rotation.z = rollStartRotationZ - angle * rollDirection;
+        } else if (rollAxis === 'z') {
+          // Rolling up/down: pivot around front/back edge
+          const pivotZ = rollStartZ + rollDirection; // Front edge (+1) or back edge (-1)
+          const pivotY = 0; // Ground level
+          
+          // As the cube rolls, it follows a circular arc around the pivot
+          cube.position.x = cubeX;
+          cube.position.y = pivotY + Math.cos(angle) * 1;
+          cube.position.z = pivotZ + Math.sin(angle) * rollDirection;
+          
+          // The cube rotates around X axis
+          cube.rotation.x = rollStartRotationX + angle * rollDirection;
+        }
         
         render();
         animationId = requestAnimationFrame(animate);
@@ -131,24 +148,39 @@
         isAnimating = false;
         rollProgress = 0;
         cubeX = targetX;
+        cubeZ = targetZ;
         
         // Set final position to match exactly what the animation would calculate
         const finalAngle = Math.PI / 2;
-        const pivotX = rollStartX + 1;
-        const pivotY = 0;
-        cube.position.x = pivotX + Math.sin(finalAngle) * 1; // Should equal targetX
-        cube.position.y = pivotY + Math.cos(finalAngle) * 1; // Should equal 1
+        
+        if (rollAxis === 'x') {
+          const pivotX = rollStartX + rollDirection;
+          const pivotY = 0;
+          cube.position.x = pivotX + Math.sin(finalAngle) * rollDirection;
+          cube.position.y = pivotY + Math.cos(finalAngle) * 1;
+          cube.position.z = cubeZ;
+        } else if (rollAxis === 'z') {
+          const pivotZ = rollStartZ + rollDirection;
+          const pivotY = 0;
+          cube.position.x = cubeX;
+          cube.position.y = pivotY + Math.cos(finalAngle) * 1;
+          cube.position.z = pivotZ + Math.sin(finalAngle) * rollDirection;
+        }
         
         render();
       }
     };
 
-    const startRoll = () => {
+    const startRoll = (axis: string, direction: number) => {
       if (!isAnimating) {
         isAnimating = true;
         rollProgress = 0;
         rollStartX = cubeX;
-        rollStartRotation = cube.rotation.z;
+        rollStartZ = cubeZ;
+        rollStartRotationX = cube.rotation.x;
+        rollStartRotationZ = cube.rotation.z;
+        rollAxis = axis;
+        rollDirection = direction;
         animate();
       }
     };
@@ -168,7 +200,31 @@
           if (gridX < 3) {
             gridX += 1;
             targetX = gridToWorld(gridX);
-            startRoll();
+            startRoll('x', 1); // Roll right
+          }
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          if (gridX > 1) {
+            gridX -= 1;
+            targetX = gridToWorld(gridX);
+            startRoll('x', -1); // Roll left
+          }
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          if (gridY < 3) {
+            gridY += 1;
+            targetZ = gridToWorld(gridY);
+            startRoll('z', -1); // Roll up (was 1)
+          }
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          if (gridY > 1) {
+            gridY -= 1;
+            targetZ = gridToWorld(gridY);
+            startRoll('z', 1); // Roll down (was -1)
           }
           break;
       }
@@ -192,6 +248,7 @@
     cubeX = -2;
     cubeZ = 2;
     targetX = -2;
+    targetZ = 2;
     
     // Reset cube position and rotation
     if (cube) {
