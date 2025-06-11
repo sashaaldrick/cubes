@@ -3,13 +3,10 @@
   import * as THREE from 'three';
 
   let canvas: HTMLCanvasElement;
-  let mouseDown = false;
-  let mouseX = 0;
-  let mouseY = 0;
   let targetRotationX = 0;
-  let targetRotationY = 0;
+  let targetRotationZ = 0;
   let rotationX = 0;
-  let rotationY = 0;
+  let rotationZ = 0;
   let animationId: number;
   let isAnimating = false;
   let startAnimation: () => void;
@@ -24,7 +21,8 @@
       0.1,
       1000
     );
-    camera.position.z = 5;
+    camera.position.set(0, 5, 0);
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ 
       canvas, 
@@ -58,23 +56,23 @@
 
     const render = () => {
       cube.rotation.x = rotationX;
-      cube.rotation.y = rotationY;
+      cube.rotation.z = rotationZ;
       renderer.render(scene, camera);
     };
 
     const animate = () => {
       const deltaX = Math.abs(targetRotationX - rotationX);
-      const deltaY = Math.abs(targetRotationY - rotationY);
+      const deltaZ = Math.abs(targetRotationZ - rotationZ);
       
-      if (deltaX > 0.001 || deltaY > 0.001) {
+      if (deltaX > 0.001 || deltaZ > 0.001) {
         rotationX += (targetRotationX - rotationX) * 0.1;
-        rotationY += (targetRotationY - rotationY) * 0.1;
+        rotationZ += (targetRotationZ - rotationZ) * 0.1;
         render();
         animationId = requestAnimationFrame(animate);
       } else {
         isAnimating = false;
         rotationX = targetRotationX;
-        rotationY = targetRotationY;
+        rotationZ = targetRotationZ;
         render();
       }
     };
@@ -88,46 +86,48 @@
 
     render();
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isAnimating) return;
+      
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          targetRotationX -= Math.PI / 2;
+          startAnimation();
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          targetRotationX += Math.PI / 2;
+          startAnimation();
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          targetRotationZ += Math.PI / 2;
+          startAnimation();
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          targetRotationZ -= Math.PI / 2;
+          startAnimation();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
       if (animationId) cancelAnimationFrame(animationId);
       renderer.dispose();
     };
   });
-
-  function handleMouseDown(event: MouseEvent) {
-    mouseDown = true;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-  }
-
-  function handleMouseUp() {
-    mouseDown = false;
-  }
-
-  function handleMouseMove(event: MouseEvent) {
-    if (!mouseDown) return;
-
-    const deltaX = event.clientX - mouseX;
-    const deltaY = event.clientY - mouseY;
-
-    targetRotationY += deltaX * 0.01;
-    targetRotationX += deltaY * 0.01;
-
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    
-    if (startAnimation) startAnimation();
-  }
 </script>
 
 <canvas
   bind:this={canvas}
-  on:mousedown={handleMouseDown}
-  on:mouseup={handleMouseUp}
-  on:mousemove={handleMouseMove}
-  on:mouseleave={handleMouseUp}
   class="cube-canvas"
+  tabindex="0"
 ></canvas>
 
 <style>
@@ -135,10 +135,10 @@
     width: 100%;
     height: 100%;
     display: block;
-    cursor: grab;
+    outline: none;
   }
-
-  .cube-canvas:active {
-    cursor: grabbing;
+  
+  .cube-canvas:focus {
+    box-shadow: 0 0 0 2px #0066cc;
   }
 </style>
