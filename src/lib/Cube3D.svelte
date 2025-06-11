@@ -10,6 +10,9 @@
   let targetRotationY = 0;
   let rotationX = 0;
   let rotationY = 0;
+  let animationId: number;
+  let isAnimating = false;
+  let startAnimation: () => void;
 
   onMount(() => {
     const scene = new THREE.Scene();
@@ -23,9 +26,13 @@
     );
     camera.position.z = 5;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ 
+      canvas, 
+      antialias: false,
+      powerPreference: "high-performance"
+    });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const geometry = new THREE.BoxGeometry(2, 2, 2);
     const material = new THREE.MeshBasicMaterial({
@@ -44,26 +51,46 @@
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     };
 
     window.addEventListener('resize', handleResize);
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      rotationX += (targetRotationX - rotationX) * 0.05;
-      rotationY += (targetRotationY - rotationY) * 0.05;
-
+    const render = () => {
       cube.rotation.x = rotationX;
       cube.rotation.y = rotationY;
-
       renderer.render(scene, camera);
     };
 
-    animate();
+    const animate = () => {
+      const deltaX = Math.abs(targetRotationX - rotationX);
+      const deltaY = Math.abs(targetRotationY - rotationY);
+      
+      if (deltaX > 0.001 || deltaY > 0.001) {
+        rotationX += (targetRotationX - rotationX) * 0.1;
+        rotationY += (targetRotationY - rotationY) * 0.1;
+        render();
+        animationId = requestAnimationFrame(animate);
+      } else {
+        isAnimating = false;
+        rotationX = targetRotationX;
+        rotationY = targetRotationY;
+        render();
+      }
+    };
+
+    startAnimation = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        animate();
+      }
+    };
+
+    render();
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      if (animationId) cancelAnimationFrame(animationId);
       renderer.dispose();
     };
   });
@@ -89,6 +116,8 @@
 
     mouseX = event.clientX;
     mouseY = event.clientY;
+    
+    if (startAnimation) startAnimation();
   }
 </script>
 

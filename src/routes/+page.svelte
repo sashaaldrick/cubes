@@ -3,7 +3,9 @@
 </script>
 
 <div class="container">
-  <Cube3D />
+  <div class="cube-wrapper">
+    <Cube3D />
+  </div>
 </div>
 
 <style>
@@ -14,6 +16,14 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .cube-wrapper {
+    width: 600px;
+    height: 600px;
+    max-width: 90vw;
+    max-height: 90vh;
   }
 
   :global(body) {

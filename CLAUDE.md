@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Server
+
+The user has their own dev server running at all times. Do not start the dev server with `npm run dev` unless explicitly asked.
+
 ## Commands
 
 ### Development
