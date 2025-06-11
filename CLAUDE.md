@@ -35,3 +35,7 @@ This is a SvelteKit application using:
 - `+layout.svelte` files define shared layouts
 - `+server.ts` files define server-side endpoints
 - Components in `src/lib/` can be imported using `$lib/component-name`
+
+## Git Shortcuts
+
+- When user writes "push that", add all changes, commit with a reasonable message, and push to the current branch

@@ -3,15 +3,19 @@
   import * as THREE from 'three';
 
   let canvas: HTMLCanvasElement;
-  let targetRotationX = 0;
-  let targetRotationZ = 0;
-  let rotationX = 0;
-  let rotationZ = 0;
   let animationId: number;
   let isAnimating = false;
-  let startAnimation: () => void;
+  let cube: THREE.Mesh;
+  let render: () => void;
+  
+  // Grid position (1-3, 1-3)
+  let gridX = 1;
+  let gridY = 1;
+  
+  // Actual 3D position
   let cubeX = -2;
   let cubeZ = 2;
+  let targetX = -2;
 
   onMount(() => {
     const scene = new THREE.Scene();
@@ -72,7 +76,8 @@
       color: 0x0066cc,
       wireframe: false
     });
-    const cube = new THREE.Mesh(geometry, material);
+    
+    cube = new THREE.Mesh(geometry, material);
     cube.position.set(cubeX, 1, cubeZ);
     scene.add(cube);
 
@@ -90,61 +95,81 @@
 
     window.addEventListener('resize', handleResize);
 
-    const render = () => {
-      cube.rotation.x = rotationX;
-      cube.rotation.z = rotationZ;
+    render = () => {
       renderer.render(scene, camera);
     };
 
+    // Rolling animation variables
+    let rollProgress = 0;
+    let rollStartX = 0;
+    let rollStartRotation = 0;
+
     const animate = () => {
-      const deltaX = Math.abs(targetRotationX - rotationX);
-      const deltaZ = Math.abs(targetRotationZ - rotationZ);
-      
-      if (deltaX > 0.001 || deltaZ > 0.001) {
-        rotationX += (targetRotationX - rotationX) * 0.1;
-        rotationZ += (targetRotationZ - rotationZ) * 0.1;
+      if (rollProgress < 1) {
+        rollProgress += 0.05;
+        
+        const angle = (Math.PI / 2) * rollProgress;
+        
+        // Rolling right: pivot around bottom-right edge
+        // Pivot is at the bottom-right corner of the cube at ground level
+        const pivotX = rollStartX + 1; // Right edge of cube
+        const pivotY = 0; // Ground level
+        
+        // As the cube rolls, it follows a circular arc around the pivot
+        // The center of the cube moves in a quarter circle with radius 1 (half cube size)
+        cube.position.x = pivotX + Math.sin(angle) * 1;
+        cube.position.y = pivotY + Math.cos(angle) * 1;
+        cube.position.z = cubeZ;
+        
+        // The cube rotates clockwise when rolling right
+        cube.rotation.z = rollStartRotation - angle;
+        
         render();
         animationId = requestAnimationFrame(animate);
       } else {
+        // Animation complete
         isAnimating = false;
-        rotationX = targetRotationX;
-        rotationZ = targetRotationZ;
+        rollProgress = 0;
+        cubeX = targetX;
+        
+        // Set final position to match exactly what the animation would calculate
+        const finalAngle = Math.PI / 2;
+        const pivotX = rollStartX + 1;
+        const pivotY = 0;
+        cube.position.x = pivotX + Math.sin(finalAngle) * 1; // Should equal targetX
+        cube.position.y = pivotY + Math.cos(finalAngle) * 1; // Should equal 1
+        
         render();
       }
     };
 
-    startAnimation = () => {
+    const startRoll = () => {
       if (!isAnimating) {
         isAnimating = true;
+        rollProgress = 0;
+        rollStartX = cubeX;
+        rollStartRotation = cube.rotation.z;
         animate();
       }
     };
 
     render();
 
+    const gridToWorld = (gridPos: number) => {
+      return (gridPos - 2) * 2;
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isAnimating) return;
       
       switch (event.key) {
-        case 'ArrowUp':
-          event.preventDefault();
-          targetRotationX -= Math.PI / 2;
-          startAnimation();
-          break;
-        case 'ArrowDown':
-          event.preventDefault();
-          targetRotationX += Math.PI / 2;
-          startAnimation();
-          break;
-        case 'ArrowLeft':
-          event.preventDefault();
-          targetRotationZ += Math.PI / 2;
-          startAnimation();
-          break;
         case 'ArrowRight':
           event.preventDefault();
-          targetRotationZ -= Math.PI / 2;
-          startAnimation();
+          if (gridX < 3) {
+            gridX += 1;
+            targetX = gridToWorld(gridX);
+            startRoll();
+          }
           break;
       }
     };
@@ -158,6 +183,23 @@
       renderer.dispose();
     };
   });
+
+  export function reset() {
+    if (isAnimating) return;
+    
+    gridX = 1;
+    gridY = 1;
+    cubeX = -2;
+    cubeZ = 2;
+    targetX = -2;
+    
+    // Reset cube position and rotation
+    if (cube) {
+      cube.position.set(cubeX, 1, cubeZ);
+      cube.rotation.set(0, 0, 0);
+      render();
+    }
+  }
 </script>
 
 <canvas
