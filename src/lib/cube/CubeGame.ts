@@ -54,8 +54,18 @@ export class CubeGame {
   private setupCube() {
     // Create cube mesh
     const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshNormalMaterial(); // Shows rotation clearly
-    const mesh = new THREE.Mesh(geometry, material);
+    
+    // Create distinct materials for each face (muted colors)
+    const materials = [
+      new THREE.MeshBasicMaterial({ color: 0xcc6666 }), // Right - Muted Red
+      new THREE.MeshBasicMaterial({ color: 0x66cc66 }), // Left - Muted Green  
+      new THREE.MeshBasicMaterial({ color: 0x6666cc }), // Top - Muted Blue
+      new THREE.MeshBasicMaterial({ color: 0xcccc66 }), // Bottom - Muted Yellow
+      new THREE.MeshBasicMaterial({ color: 0xcc66cc }), // Front - Muted Magenta
+      new THREE.MeshBasicMaterial({ color: 0x66cccc })  // Back - Muted Cyan
+    ];
+    
+    const mesh = new THREE.Mesh(geometry, materials);
     
     // Add edges for clarity
     const edges = new THREE.EdgesGeometry(geometry);

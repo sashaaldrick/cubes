@@ -1,7 +1,7 @@
 <script lang="ts">
   import SimpleCube from "../lib/SimpleCube.svelte";
 
-  let gridSize = 3;
+  let gridSize = 7;
   let key = 0;
 
   const changeGridSize = (newSize: number) => {
