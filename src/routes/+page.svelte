@@ -4,7 +4,9 @@
   let gridSize = 8;
   let key = 0;
   let currentTile: string | null = null;
+  let currentGridLevel = 0;
   let lastVisitedTile: string | null = null;
+  let lastVisitedLevel = 0;
 
   // const changeGridSize = (newSize: number) => {
   //   gridSize = newSize;
@@ -13,10 +15,13 @@
 
   const handlePositionChange = (event: CustomEvent) => {
     currentTile = event.detail.chessNotation;
+    currentGridLevel = event.detail.gridLevel;
 
-    // Update lastVisitedTile when we land on a colored tile
-    if (currentTile === "b7" || currentTile === "g3") {
+    // Update lastVisitedTile when we land on a colored tile on any grid
+    const coloredTiles = ["b7", "g3", "e4", "f2", "d5", "a1", "h8", "c3", "a8", "h1"];
+    if (currentTile && coloredTiles.includes(currentTile)) {
       lastVisitedTile = currentTile;
+      lastVisitedLevel = currentGridLevel;
     }
   };
 </script>
@@ -32,7 +37,7 @@
 
   <div class="content-section">
     <div class="content-page">
-      {#if lastVisitedTile === "b7"}
+      {#if lastVisitedTile === "b7" && lastVisitedLevel === 0}
         <h1>Books</h1>
         <p>Recently read books:</p>
         <ul>
@@ -40,7 +45,7 @@
           <li>Dealers of Lightning (Xerox Parc) by Michael A. Hiltzik</li>
           <li>The Best Interface is No Interface by Golden Krishna</li>
         </ul>
-      {:else if lastVisitedTile === "g3"}
+      {:else if lastVisitedTile === "g3" && lastVisitedLevel === 0}
         <h1>Blog</h1>
         <ul>
           <li>28 Apr, 2025 spring break 2025</li>
@@ -53,11 +58,76 @@
           <li>16 Apr, 2025 retroactive big data analysis of YOU with AI</li>
           <li>14 Apr, 2025 what would I want from good flashcard software?</li>
         </ul>
+      {:else if lastVisitedTile === "e4" && lastVisitedLevel === 1}
+        <h1>Projects</h1>
+        <p>Current coding projects:</p>
+        <ul>
+          <li>Hypergrid v2 - Isometric multi-level grid navigation</li>
+          <li>AI Writing Assistant - Context-aware content generation</li>
+          <li>3D Portfolio Site - Interactive Three.js experience</li>
+        </ul>
+      {:else if lastVisitedTile === "f2" && lastVisitedLevel === 1}
+        <h1>Skills</h1>
+        <p>Technical expertise:</p>
+        <ul>
+          <li>TypeScript & JavaScript - Full-stack development</li>
+          <li>Three.js & WebGL - 3D graphics and visualization</li>
+          <li>Svelte/SvelteKit - Modern reactive frameworks</li>
+          <li>AI/ML - Large language models and prompt engineering</li>
+        </ul>
+      {:else if lastVisitedTile === "d5" && lastVisitedLevel === 2}
+        <h1>Experience</h1>
+        <p>Professional background:</p>
+        <ul>
+          <li>Senior Frontend Developer - 5+ years</li>
+          <li>3D Graphics Specialist - Interactive visualizations</li>
+          <li>Open Source Contributor - Multiple TypeScript projects</li>
+        </ul>
+      {:else if lastVisitedTile === "a1" && lastVisitedLevel === 2}
+        <h1>Contact</h1>
+        <p>Get in touch:</p>
+        <ul>
+          <li>GitHub: @username</li>
+          <li>Email: developer@example.com</li>
+          <li>LinkedIn: /in/developer</li>
+        </ul>
+      {:else if lastVisitedTile === "h8" && lastVisitedLevel === 2}
+        <h1>Philosophy</h1>
+        <p>Development principles:</p>
+        <ul>
+          <li>User-centered design - Build for real human needs</li>
+          <li>Progressive enhancement - Start simple, add complexity</li>
+          <li>Performance first - Fast, accessible, sustainable code</li>
+        </ul>
+      {:else if lastVisitedTile === "c3" && lastVisitedLevel === 2}
+        <h1>Tools</h1>
+        <p>Favorite development tools:</p>
+        <ul>
+          <li>VS Code - Primary code editor</li>
+          <li>Vite - Lightning-fast build tooling</li>
+          <li>Claude Code - AI-powered development assistant</li>
+          <li>Figma - Design and prototyping</li>
+        </ul>
+      {:else if lastVisitedTile === "a8" && lastVisitedLevel === 1}
+        <h1>Elevator Up ⬆️</h1>
+        <p>You found an upward elevator tile!</p>
+        <p>Bright gold tiles (like a8, h1) take you back up to the previous level.</p>
+        <p>This allows you to navigate back through the grid stack.</p>
+      {:else if lastVisitedTile === "h1" && lastVisitedLevel === 2}
+        <h1>Elevator Up ⬆️</h1>
+        <p>You found an upward elevator tile!</p>
+        <p>Bright gold tiles (like a8, h1) take you back up to the previous level.</p>
+        <p>This allows you to navigate back through the grid stack.</p>
       {:else}
-        <h1>Welcome to Hypergrid</h1>
+        <h1>Welcome to Hypergrid v2</h1>
         <p>Use arrow keys to move the cube around the grid to explore.</p>
-        <p>Gray tiles contain content.</p>
-        <p>Press R to reset the cube back to the center.</p>
+        <p><strong>Navigation:</strong></p>
+        <ul>
+          <li>🔽 Most colored tiles drop you to the next level down</li>
+          <li>🔼 Bright gold tiles (a8, h1) take you back up</li>
+          <li>📍 Current level: {currentGridLevel}</li>
+          <li>🔄 Press R to reset to the top grid center</li>
+        </ul>
       {/if}
     </div>
   </div>
