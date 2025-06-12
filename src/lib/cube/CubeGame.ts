@@ -101,6 +101,9 @@ export class CubeGame {
       if (move) {
         e.preventDefault();
         this.tryMove(move);
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        this.resetCube();
       }
     });
   }
@@ -215,6 +218,20 @@ export class CubeGame {
     return t < 0.5 
       ? 4 * t * t * t 
       : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  
+  private resetCube() {
+    // Reset grid position to center
+    this.cube.gridPosition = { 
+      x: Math.floor(this.gridSize / 2), 
+      z: Math.floor(this.gridSize / 2) 
+    };
+    
+    // Reset orientation to identity (no rotation)
+    this.cube.orientation = new THREE.Quaternion();
+    
+    // Update the cube's visual position and rotation
+    this.updateCubePosition();
   }
   
   render() {
