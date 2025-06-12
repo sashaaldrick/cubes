@@ -1,12 +1,14 @@
 <!-- SimpleCube.svelte -->
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import { CubeGame } from "./cube/CubeGame";
 
   export let gridSize = 3;
 
   let canvas: HTMLCanvasElement;
   let game: CubeGame;
+  
+  const dispatch = createEventDispatcher();
 
   onMount(() => {
     // Get the actual size of the canvas container
@@ -20,6 +22,13 @@
     game = new CubeGame(canvas, gridSize);
     game.startGameLoop();
 
+    // Handle cube position changes
+    const handlePositionChange = (event: CustomEvent) => {
+      dispatch('positionChange', event.detail);
+    };
+    
+    window.addEventListener('cubePositionChanged', handlePositionChange as EventListener);
+
     // Handle window resize
     const handleResize = () => {
       const { width, height } = container.getBoundingClientRect();
@@ -32,6 +41,7 @@
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener('cubePositionChanged', handlePositionChange as EventListener);
     };
   });
 </script>

@@ -39,3 +39,23 @@ This is a SvelteKit application using:
 ## Git Shortcuts
 
 - When user writes "push that", add all changes, commit with a reasonable message, and push to the current branch
+
+## Grid Tile Colors
+
+The grid uses chess notation for tile specification:
+- X-axis: a through h (left to right)
+- Y-axis: 1 through 8 (bottom to top)
+- Grid size is 8x8
+
+Tiles are specified like chess squares (e.g., "b7", "e4"). 
+
+Currently colored tiles:
+- b7: Gray (0x808080)
+- e4: Gold (0xffcc00)
+- f2: Light red (0xff6b6b)
+- d5: Teal (0x4ecdc4)
+- a1: Mint (0x95e1d3)
+- h8: Lavender (0xc7ceea)
+- c3: Orange (0xfeca57)
+
+To add or modify colored tiles, update the `TILE_COLORS` object in `src/lib/cube/CubeGame.ts`.

@@ -1,60 +1,112 @@
 <script lang="ts">
   import SimpleCube from "../lib/SimpleCube.svelte";
 
-  let gridSize = 7;
+  let gridSize = 8;
   let key = 0;
+  let currentTile: string | null = null;
 
   const changeGridSize = (newSize: number) => {
     gridSize = newSize;
     key++; // Force re-mount
   };
+  
+  const handlePositionChange = (event: CustomEvent) => {
+    currentTile = event.detail.chessNotation;
+  };
+  
+  $: showSidebar = currentTile === 'b7';
 </script>
 
-<div class="container">
-  <div class="cube-wrapper">
-    {#key key}
-      <SimpleCube {gridSize} />
-    {/key}
-  </div>
-  <div class="controls">
-    <div class="grid-controls">
-      <span>Grid Size:</span>
-      <button
-        class="size-button"
-        class:active={gridSize === 3}
-        on:click={() => changeGridSize(3)}>3x3</button
-      >
-      <button
-        class="size-button"
-        class:active={gridSize === 5}
-        on:click={() => changeGridSize(5)}>5x5</button
-      >
-      <button
-        class="size-button"
-        class:active={gridSize === 7}
-        on:click={() => changeGridSize(7)}>7x7</button
-      >
+<div class="main-container">
+  {#if showSidebar}
+    <div class="sidebar">
+      <h1>Hello!</h1>
+    </div>
+  {/if}
+  
+  <div class="container" class:with-sidebar={showSidebar}>
+    <div class="cube-wrapper">
+      {#key key}
+        <SimpleCube {gridSize} on:positionChange={handlePositionChange} />
+      {/key}
+    </div>
+    <div class="controls">
+      <div class="grid-controls">
+        <span>Grid Size:</span>
+        <button
+          class="size-button"
+          class:active={gridSize === 4}
+          on:click={() => changeGridSize(4)}>4x4</button
+        >
+        <button
+          class="size-button"
+          class:active={gridSize === 6}
+          on:click={() => changeGridSize(6)}>6x6</button
+        >
+        <button
+          class="size-button"
+          class:active={gridSize === 8}
+          on:click={() => changeGridSize(8)}>8x8</button
+        >
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  .container {
+  .main-container {
     width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .sidebar {
+    width: 300px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .sidebar h1 {
+    margin: 0;
+    color: #333;
+    font-size: 2.5em;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .container {
+    flex: 1;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    overflow: hidden;
-    background-color: #f0f0f0;
+    transition: all 0.3s ease-out;
+  }
+
+  .container.with-sidebar {
+    padding-left: 20px;
   }
 
   .cube-wrapper {
     width: 600px;
     height: 600px;
-    max-width: 90vw;
-    max-height: 90vh;
+    max-width: 70vw;
+    max-height: 70vh;
     position: relative;
   }
 
@@ -99,9 +151,25 @@
     border-color: #0052a3;
   }
 
-
   :global(body) {
     margin: 0;
     padding: 0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 200px;
+      padding: 20px;
+    }
+    
+    .sidebar h1 {
+      font-size: 1.8em;
+    }
+    
+    .cube-wrapper {
+      width: 400px;
+      height: 400px;
+    }
   }
 </style>

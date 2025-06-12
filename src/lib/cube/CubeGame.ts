@@ -11,6 +11,22 @@ interface CubeState {
   orientation: THREE.Quaternion; // Track orientation separately
 }
 
+// Chess notation for tiles
+type ChessFile = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
+type ChessRank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type ChessNotation = `${ChessFile}${ChessRank}`;
+
+// Tile colors configuration
+const TILE_COLORS: Record<ChessNotation, number> = {
+  'b7': 0x808080, // Gray
+  'e4': 0xffcc00, // Gold
+  'f2': 0xff6b6b, // Light red
+  'd5': 0x4ecdc4, // Teal
+  'a1': 0x95e1d3, // Mint
+  'h8': 0xc7ceea, // Lavender
+  'c3': 0xfeca57, // Orange
+} as Record<ChessNotation, number>;
+
 // Main game class - handles all game logic
 export class CubeGame {
   private scene!: THREE.Scene;
@@ -87,6 +103,7 @@ export class CubeGame {
   }
   
   private setupGrid() {
+    // Create grid lines
     const gridHelper = new THREE.GridHelper(
       this.gridSize * 2, 
       this.gridSize, 
@@ -94,6 +111,45 @@ export class CubeGame {
       0x666666   // Medium gray for subdivisions
     );
     this.scene.add(gridHelper);
+
+    // Create colored tiles if grid is 8x8
+    if (this.gridSize === 8) {
+      this.createColoredTiles();
+    }
+  }
+
+  private createColoredTiles() {
+    const tileGeometry = new THREE.PlaneGeometry(2, 2);
+    
+    // Convert grid position to chess notation
+    const getChessNotation = (x: number, z: number): ChessNotation | null => {
+      if (x < 0 || x >= 8 || z < 0 || z >= 8) return null;
+      const file = String.fromCharCode('a'.charCodeAt(0) + x) as ChessFile;
+      const rank = (8 - z) as ChessRank; // Invert z to match chess board (rank 8 at top)
+      return `${file}${rank}` as ChessNotation;
+    };
+
+    // Create tiles for colored squares
+    for (let x = 0; x < 8; x++) {
+      for (let z = 0; z < 8; z++) {
+        const notation = getChessNotation(x, z);
+        if (notation && TILE_COLORS[notation]) {
+          const tileMaterial = new THREE.MeshBasicMaterial({
+            color: TILE_COLORS[notation],
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.5
+          });
+          
+          const tileMesh = new THREE.Mesh(tileGeometry, tileMaterial);
+          const worldPos = this.gridToWorld({ x, z });
+          tileMesh.position.set(worldPos.x, 0.01, worldPos.z); // Slightly above ground
+          tileMesh.rotation.x = -Math.PI / 2; // Rotate to be horizontal
+          
+          this.scene.add(tileMesh);
+        }
+      }
+    }
   }
   
   private setupControls() {
@@ -202,6 +258,9 @@ export class CubeGame {
         
         // Store final orientation
         this.cube.mesh.quaternion.copy(this.cube.orientation);
+        
+        // Dispatch position change event
+        this.dispatchPositionChangeEvent();
       }
     };
     
@@ -242,6 +301,29 @@ export class CubeGame {
     
     // Update the cube's visual position and rotation
     this.updateCubePosition();
+    
+    // Dispatch position change event
+    this.dispatchPositionChangeEvent();
+  }
+  
+  private getChessNotation(position: Position): ChessNotation | null {
+    if (this.gridSize !== 8) return null;
+    if (position.x < 0 || position.x >= 8 || position.z < 0 || position.z >= 8) return null;
+    
+    const file = String.fromCharCode('a'.charCodeAt(0) + position.x) as ChessFile;
+    const rank = (8 - position.z) as ChessRank; // Invert z to match chess board (rank 8 at top)
+    return `${file}${rank}` as ChessNotation;
+  }
+  
+  private dispatchPositionChangeEvent() {
+    const notation = this.getChessNotation(this.cube.gridPosition);
+    const event = new CustomEvent('cubePositionChanged', {
+      detail: {
+        gridPosition: { ...this.cube.gridPosition },
+        chessNotation: notation
+      }
+    });
+    window.dispatchEvent(event);
   }
   
   render() {
@@ -249,6 +331,9 @@ export class CubeGame {
   }
   
   startGameLoop() {
+    // Dispatch initial position
+    this.dispatchPositionChangeEvent();
+    
     const animate = () => {
       requestAnimationFrame(animate);
       this.render();
