@@ -19,12 +19,7 @@ type ChessNotation = `${ChessFile}${ChessRank}`;
 // Tile colors configuration
 const TILE_COLORS: Record<ChessNotation, number> = {
   'b7': 0x808080, // Gray
-  'e4': 0xffcc00, // Gold
-  'f2': 0xff6b6b, // Light red
-  'd5': 0x4ecdc4, // Teal
-  'a1': 0x95e1d3, // Mint
-  'h8': 0xc7ceea, // Lavender
-  'c3': 0xfeca57, // Orange
+  'g3': 0x808080, // Gray
 } as Record<ChessNotation, number>;
 
 // Main game class - handles all game logic

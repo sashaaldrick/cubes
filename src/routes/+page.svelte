@@ -4,17 +4,21 @@
   let gridSize = 8;
   let key = 0;
   let currentTile: string | null = null;
+  let lastVisitedTile: string | null = null;
 
   // const changeGridSize = (newSize: number) => {
   //   gridSize = newSize;
   //   key++; // Force re-mount
   // };
-  
+
   const handlePositionChange = (event: CustomEvent) => {
     currentTile = event.detail.chessNotation;
+
+    // Update lastVisitedTile when we land on a colored tile
+    if (currentTile === "b7" || currentTile === "g3") {
+      lastVisitedTile = currentTile;
+    }
   };
-  
-  $: showSidebar = currentTile === 'b7';
 </script>
 
 <div class="main-container">
@@ -24,33 +28,43 @@
         <SimpleCube {gridSize} on:positionChange={handlePositionChange} />
       {/key}
     </div>
-    <!-- <div class="controls">
-      <div class="grid-controls">
-        <span>Grid Size:</span>
-        <button
-          class="size-button"
-          class:active={gridSize === 4}
-          on:click={() => changeGridSize(4)}>4x4</button
-        >
-        <button
-          class="size-button"
-          class:active={gridSize === 6}
-          on:click={() => changeGridSize(6)}>6x6</button
-        >
-        <button
-          class="size-button"
-          class:active={gridSize === 8}
-          on:click={() => changeGridSize(8)}>8x8</button
-        >
-      </div>
-    </div> -->
   </div>
-  
-  {#if showSidebar}
-    <div class="content-section">
-      <h1>Hello!</h1>
+
+  <div class="content-section">
+    <div class="content-page">
+      {#if lastVisitedTile === "b7"}
+        <h1>Books</h1>
+        <p>Recently read books:</p>
+        <ul>
+          <li>Project Hail Mary by Andy Weir</li>
+          <li>Dealers of Lightning (Xerox Parc) by Michael A. Hiltzik</li>
+          <li>The Best Interface is No Interface by Golden Krishna</li>
+        </ul>
+      {:else if lastVisitedTile === "g3"}
+        <h1>Blog</h1>
+        <ul>
+          <li>28 Apr, 2025 spring break 2025</li>
+          <li>
+            25 Apr, 2025 social media is dead. long live ad media (and what we
+            can do about it)
+          </li>
+          <li>20 Apr, 2025 self driving cars are boring</li>
+          <li>17 Apr, 2025 do I leave the Apple walled garden (again)?</li>
+          <li>16 Apr, 2025 retroactive big data analysis of YOU with AI</li>
+          <li>14 Apr, 2025 what would I want from good flashcard software?</li>
+        </ul>
+      {:else}
+        <h1>Welcome</h1>
+        <p>Move the cube around the grid to explore different content.</p>
+        <p>Gray tiles contain special content:</p>
+        <ul>
+          <li><strong>b7</strong> - Books I've read recently</li>
+          <li><strong>g3</strong> - Blog entries</li>
+        </ul>
+        <p>Use WASD keys to move the cube around the 8×8 grid.</p>
+      {/if}
     </div>
-  {/if}
+  </div>
 </div>
 
 <style>
@@ -58,41 +72,54 @@
     width: 100vw;
     height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 60px;
+    align-items: stretch;
+    justify-content: stretch;
     overflow: hidden;
     background-color: #f0f0f0;
   }
 
   .game-section {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: flex-end;
+    padding: 20px 0 20px 40px;
   }
 
   .content-section {
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    animation: slideInFromRight 0.3s ease-out;
-  }
-  
-  .content-section h1 {
-    margin: 0;
-    color: #333;
-    font-size: 3em;
+    justify-content: flex-start;
+    padding: 20px 40px 20px 0;
+    overflow-y: auto;
   }
 
-  @keyframes slideInFromRight {
-    from {
-      transform: translateX(50px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
+  .content-page {
+    text-align: left;
+  }
+
+  .content-page h1 {
+    margin: 0 0 16px 0;
+    color: #333;
+    font-size: 2.5em;
+  }
+
+  .content-page p {
+    margin: 0 0 12px 0;
+    color: #555;
+    font-size: 1.1em;
+  }
+
+  .content-page ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .content-page li {
+    margin-bottom: 8px;
   }
 
   .cube-wrapper {
@@ -152,13 +179,27 @@
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .main-container {
-      gap: 30px;
+      flex-direction: column;
     }
-    
-    .content-section h1 {
+
+    .game-section {
+      flex: 0 0 60vh;
+      order: 1;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .content-section {
+      flex: 1;
+      order: 2;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .content-page h1 {
       font-size: 2em;
     }
-    
+
     .cube-wrapper {
       width: 400px;
       height: 400px;
