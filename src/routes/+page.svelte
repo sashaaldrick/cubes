@@ -54,7 +54,7 @@
           <li>14 Apr, 2025 what would I want from good flashcard software?</li>
         </ul>
       {:else}
-        <h1>Welcome</h1>
+        <h1>Welcome to Hypergrid</h1>
         <p>Move the cube around the grid to explore different content.</p>
         <p>Gray tiles contain special content:</p>
         <ul>
@@ -62,6 +62,7 @@
           <li><strong>g3</strong> - Blog entries</li>
         </ul>
         <p>Use WASD keys to move the cube around the 8×8 grid.</p>
+        <p>Press R to reset the cube back to the center.</p>
       {/if}
     </div>
   </div>

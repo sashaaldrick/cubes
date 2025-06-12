@@ -54,10 +54,6 @@
 
 <div class="container">
   <canvas bind:this={canvas}></canvas>
-  <div class="instructions">
-    <p>Use arrow keys to roll the cube</p>
-    <p>Press R to reset</p>
-  </div>
 </div>
 
 <style>
@@ -73,20 +69,4 @@
     display: block;
   }
 
-  .instructions {
-    position: absolute;
-    bottom: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
-
-  .instructions p {
-    margin: 5px 0;
-    font-size: 14px;
-  }
 </style>
