@@ -127,7 +127,7 @@ export class CubeGame {
     // Calculate roll axis and angle
     const axis = direction.x !== 0 
       ? new THREE.Vector3(0, 0, -direction.x)  // Roll around Z for left/right
-      : new THREE.Vector3(-direction.z, 0, 0); // Roll around X for up/down
+      : new THREE.Vector3(direction.z, 0, 0);   // Roll around X for up/down (reversed)
     
     const angle = Math.PI / 2;
     
