@@ -1,36 +1,40 @@
 <script lang="ts">
-  import Cube3D from '$lib/Cube3D.svelte';
-  
-  let cubeComponent: Cube3D;
+  import SimpleCube from "../lib/SimpleCube.svelte";
+
   let gridSize = 3;
   let key = 0;
-  
-  const resetCube = () => {
-    cubeComponent?.reset();
-  };
 
   const changeGridSize = (newSize: number) => {
     gridSize = newSize;
-    key++; // Force component re-mount
+    key++; // Force re-mount
   };
 </script>
 
 <div class="container">
   <div class="cube-wrapper">
     {#key key}
-      <Cube3D bind:this={cubeComponent} {gridSize} />
+      <SimpleCube {gridSize} />
     {/key}
   </div>
   <div class="controls">
     <div class="grid-controls">
       <span>Grid Size:</span>
-      <button class="size-button" class:active={gridSize === 3} on:click={() => changeGridSize(3)}>3x3</button>
-      <button class="size-button" class:active={gridSize === 5} on:click={() => changeGridSize(5)}>5x5</button>
-      <button class="size-button" class:active={gridSize === 7} on:click={() => changeGridSize(7)}>7x7</button>
+      <button
+        class="size-button"
+        class:active={gridSize === 3}
+        on:click={() => changeGridSize(3)}>3x3</button
+      >
+      <button
+        class="size-button"
+        class:active={gridSize === 5}
+        on:click={() => changeGridSize(5)}>5x5</button
+      >
+      <button
+        class="size-button"
+        class:active={gridSize === 7}
+        on:click={() => changeGridSize(7)}>7x7</button
+      >
     </div>
-    <button class="reset-button" on:click={resetCube}>
-      Reset
-    </button>
   </div>
 </div>
 
@@ -51,6 +55,7 @@
     height: 600px;
     max-width: 90vw;
     max-height: 90vh;
+    position: relative;
   }
 
   .controls {
