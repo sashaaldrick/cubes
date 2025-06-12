@@ -55,13 +55,8 @@
         </ul>
       {:else}
         <h1>Welcome to Hypergrid</h1>
-        <p>Move the cube around the grid to explore different content.</p>
-        <p>Gray tiles contain special content:</p>
-        <ul>
-          <li><strong>b7</strong> - Books I've read recently</li>
-          <li><strong>g3</strong> - Blog entries</li>
-        </ul>
-        <p>Use WASD keys to move the cube around the 8×8 grid.</p>
+        <p>Use arrow keys to move the cube around the grid to explore.</p>
+        <p>Gray tiles contain content.</p>
         <p>Press R to reset the cube back to the center.</p>
       {/if}
     </div>
