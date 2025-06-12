@@ -7,7 +7,7 @@
 
   let canvas: HTMLCanvasElement;
   let game: CubeGame;
-  
+
   const dispatch = createEventDispatcher();
 
   onMount(() => {
@@ -24,10 +24,13 @@
 
     // Handle cube position changes
     const handlePositionChange = (event: CustomEvent) => {
-      dispatch('positionChange', event.detail);
+      dispatch("positionChange", event.detail);
     };
-    
-    window.addEventListener('cubePositionChanged', handlePositionChange as EventListener);
+
+    window.addEventListener(
+      "cubePositionChanged",
+      handlePositionChange as EventListener,
+    );
 
     // Handle window resize
     const handleResize = () => {
@@ -41,7 +44,10 @@
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener('cubePositionChanged', handlePositionChange as EventListener);
+      window.removeEventListener(
+        "cubePositionChanged",
+        handlePositionChange as EventListener,
+      );
     };
   });
 </script>
@@ -69,7 +75,7 @@
 
   .instructions {
     position: absolute;
-    bottom: 20px;
+    bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;

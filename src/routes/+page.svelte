@@ -5,10 +5,10 @@
   let key = 0;
   let currentTile: string | null = null;
 
-  const changeGridSize = (newSize: number) => {
-    gridSize = newSize;
-    key++; // Force re-mount
-  };
+  // const changeGridSize = (newSize: number) => {
+  //   gridSize = newSize;
+  //   key++; // Force re-mount
+  // };
   
   const handlePositionChange = (event: CustomEvent) => {
     currentTile = event.detail.chessNotation;
@@ -18,19 +18,13 @@
 </script>
 
 <div class="main-container">
-  {#if showSidebar}
-    <div class="sidebar">
-      <h1>Hello!</h1>
-    </div>
-  {/if}
-  
-  <div class="container" class:with-sidebar={showSidebar}>
+  <div class="game-section">
     <div class="cube-wrapper">
       {#key key}
         <SimpleCube {gridSize} on:positionChange={handlePositionChange} />
       {/key}
     </div>
-    <div class="controls">
+    <!-- <div class="controls">
       <div class="grid-controls">
         <span>Grid Size:</span>
         <button
@@ -49,8 +43,14 @@
           on:click={() => changeGridSize(8)}>8x8</button
         >
       </div>
-    </div>
+    </div> -->
   </div>
+  
+  {#if showSidebar}
+    <div class="content-section">
+      <h1>Hello!</h1>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -58,59 +58,52 @@
     width: 100vw;
     height: 100vh;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
     overflow: hidden;
     background-color: #f0f0f0;
   }
 
-  .sidebar {
-    width: 300px;
-    height: 100vh;
-    background-color: #ffffff;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    padding: 40px 30px;
+  .game-section {
     display: flex;
-    flex-direction: column;
-    animation: slideIn 0.3s ease-out;
-  }
-  
-  .sidebar h1 {
-    margin: 0;
-    color: #333;
-    font-size: 2.5em;
+    align-items: center;
+    gap: 20px;
   }
 
-  @keyframes slideIn {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  .container {
-    flex: 1;
-    height: 100vh;
+  .content-section {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    transition: all 0.3s ease-out;
+    animation: slideInFromRight 0.3s ease-out;
+  }
+  
+  .content-section h1 {
+    margin: 0;
+    color: #333;
+    font-size: 3em;
   }
 
-  .container.with-sidebar {
-    padding-left: 20px;
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
 
   .cube-wrapper {
     width: 600px;
     height: 600px;
-    max-width: 70vw;
+    max-width: 50vw;
     max-height: 70vh;
     position: relative;
   }
 
-  .controls {
+  /* .controls {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -149,7 +142,7 @@
     background-color: #0066cc;
     color: white;
     border-color: #0052a3;
-  }
+  } */
 
   :global(body) {
     margin: 0;
@@ -158,13 +151,12 @@
 
   /* Responsive adjustments */
   @media (max-width: 768px) {
-    .sidebar {
-      width: 200px;
-      padding: 20px;
+    .main-container {
+      gap: 30px;
     }
     
-    .sidebar h1 {
-      font-size: 1.8em;
+    .content-section h1 {
+      font-size: 2em;
     }
     
     .cube-wrapper {
