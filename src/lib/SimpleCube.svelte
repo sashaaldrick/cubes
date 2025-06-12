@@ -37,7 +37,7 @@
 </script>
 
 <div class="container">
-  <canvas bind:this={canvas} />
+  <canvas bind:this={canvas}></canvas>
   <div class="instructions">
     <p>Use arrow keys to roll the cube</p>
     <p>Press R to reset</p>

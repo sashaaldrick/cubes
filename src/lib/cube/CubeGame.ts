@@ -13,10 +13,10 @@ interface CubeState {
 
 // Main game class - handles all game logic
 export class CubeGame {
-  private scene: THREE.Scene;
-  private camera: THREE.Camera;
-  private renderer: THREE.WebGLRenderer;
-  private cube: CubeState;
+  private scene!: THREE.Scene;
+  private camera!: THREE.PerspectiveCamera;
+  private renderer!: THREE.WebGLRenderer;
+  private cube!: CubeState;
   private gridSize: number;
   private animationQueue: Animation[] = [];
   
